@@ -18,7 +18,7 @@ db_from_env = dj_database_url.config()
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-GEOS_LIBRARY_PATH = "/Applications/Postgres.app/Contents/Versions/9.5/include/geos"
+GEOS_LIBRARY_PATH = os.path.dirname(os.path.abspath("usr/local/Cellar/geos/3.5.0/lib/libgeos_c.1.dylib'"))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
