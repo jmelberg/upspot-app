@@ -1,0 +1,229 @@
+{% extends 'home/base.html' %}
+{% block content %}
+
+<style>
+#bgvid {
+  margin-top: -10%;
+  width: 100%;
+  height: 100%;
+}
+
+.navbar {
+  background: rgba(0,0,0,.1);
+  border 0 !important;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+}
+figcaption {
+  position: absolute;
+  z-index: 1000;
+  /**text, adjust as req'd**/
+  width: 100%;
+  padding-top: 11%;
+  color: #FFF;
+  font-weight: 200;
+  text-align: right;
+  font-size: 20px;
+  font-size: 5.4vw;
+}
+
+#bodyContent {
+  display: none;
+}
+
+.jumbotron {
+  background-color: #FFFBFF;
+}
+#upspotMarker {
+  width: 5%;
+  margin-right: 23%;
+  margin-left: -20%;
+  opacity: .8;
+}
+
+#searchBar {
+  border 0 !important;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  width: 100%;
+  position: absolute;
+  z-index: 1000;
+  margin-top: 36%;
+}
+
+#searchForm {
+  padding-top: 6%;
+  padding-left: 4%;
+}
+
+#addressInput {
+  width: 49%;
+  height: 50px;
+  opacity: .85;
+  padding-left: 10px;
+}
+
+
+
+</style>
+<script>/* play video twice as fast */
+$(document).on('shown.bs.modal', '.modal', function() {
+  $(this).find('[autofocus]').focus();
+});
+</script>
+<div class="embed-responsive embed-responsive-4by3">
+  <figcaption>
+    <center>
+      <img id="upspotMarker" class="img img-responsive pull-right" src="http://www2.rctcbc.gov.uk/SiteElements/ResponsiveTemplates/Images/icons/Car-Marker.png"></img>
+      <p id="tagline"> <span id="verb">Find</span> a spot</p>
+    </center>
+  </figcaption>
+  <div id="searchBar">
+    <center>
+      <form name="searchForm" action="/park" method="GET">
+        <div class="input-append">
+          <input id="addressInput" class="input control" type="text" name="search" placeholder="Where do you want to park?">
+          <input id="lat" type="hidden" name="lat">
+          <input id="lng" type="hidden" name="lng">
+          <button id="searchButton" class="btn btn-primary btn-lg" type="button"><span class="glyphicon glyphicon-search"></span></button>
+        </div>
+      </form>
+    </center>
+  </div>
+  <video autoplay id="bgvid">
+    <source src="https://s3-us-west-2.amazonaws.com/upspot/upspot_stock_video.webm" type="video/webm">
+      <source src="https://s3-us-west-2.amazonaws.com/upspot/upspot_stock_video.mp4" type="video/mp4">
+      </video>
+
+    </div>
+    <div class="jumbotron" style="margin-top: -15%;">
+
+      <div class="row">
+        <div class="col-md-4">
+          <h3 class="page-header">Spots near you</h3>
+          <p> Just search for where you are headed and we'll show you available spots nearby.
+            Click a marker on the map and we'll give you a street view of the spot so you'll know if the spot meets your needs before you reserve it.
+          </p>
+        </div>
+        <div class="col-md-1"></div>
+        <div class="col-md-7">
+          <img class="img img-responsive" src="https://s3-us-west-2.amazonaws.com/upspot/Screen+Shot+2016-02-23+at+11.24.52+PM.png"></img>
+        </div>
+      </div>
+      <br/>
+      <br/>
+      <div class="row">
+        <br/>
+        <div class="col-md-1"></div>
+        <div class="col-md-3">
+        </br>
+        <center><img class="img img-responsive" src="http://pngimg.com/upload/iphone_PNG5735.png"></img>
+          <img class="img img-responsive" src="http://www.gsmsolutions.ie/LatestNews/wp-content/uploads/2015/12/app_store_logos.png"></img>
+        </center>
+      </div>
+      <div class="col-md-2"></div>
+      <div class="col-md-5">
+        <h3 class="page-header" style="padding-top: 20%;">No more circling the lot</h3>
+        <p> When you book an upspot, you will be navigated directly to the spot and can check in from the upspot app when you get there.
+          When you are ready to leave, simply click the checkout button. You only pay for the time you have used the spot.
+        </p>
+      </div>
+    </div>
+  </div>
+
+
+  <script
+  src="http://maps.google.com/maps/api/js?sensor=false&libraries=places"></script>
+  <script>
+  document.getElementById("bgvid").playbackRate = 1;
+  document.getElementById("bgvid").play();
+
+  var hidden = false;
+
+  function myHandler() {
+
+    if(hidden == false)
+    $('#verb').fadeTo(2000, 0,  function(){
+      $("#verb").text("Reserve");
+      $('#verb').fadeTo(3000, 1,  function(){
+      });
+    });
+    else{
+      $('#verb').fadeTo(2000, 0,  function(){
+        $("#verb").text("Find");
+        $("#verb").fadeTo(3000, 1,  function(){
+        });
+      });
+    }
+
+    if(hidden == false)
+    $('#upspotMarker').fadeTo(2000, 0,  function(){
+      hidden = true;
+    });
+    else{
+      $('#upspotMarker').fadeTo(3000, 1,  function(){
+        hidden = false;
+      });
+    }
+
+  }
+
+  var runAtTime = function(handler, time) {
+    var wrapped = function() {
+      if(this.currentTime >= time) {
+        $(this).off('timeupdate', wrapped);
+        return handler.apply(this, arguments);
+      }
+    }
+    return wrapped;
+  };
+
+  $(document).ready(function(){
+    $('#bodyContent').fadeIn(1000);
+
+    $("#searchButton").click(function() {
+      submitForm();
+    });
+    // Add autocomplete to search box
+    var input = document.getElementById("addressInput");
+    // var searchBox = new google.maps.places.SearchBox(input);
+    // Create the autocomplete helper, and associate it with
+    // an HTML text input box.
+    var autocomplete = new google.maps.places.Autocomplete(input);
+    // google.maps.event.addListener(autocomplete, 'place_changed', function() {
+    //   submitForm();
+    // });
+  });
+  $('#bgvid').on('timeupdate', runAtTime(myHandler, 6));
+  $('#bgvid').on('timeupdate', runAtTime(myHandler, 28));
+
+  // This function delays the sending the form until it is geocoded.
+  function geocodeForm(geocoder, address, callback){
+    geocoder.geocode({ 'address': address }, function (results, status) {
+      if (status == google.maps.GeocoderStatus.OK) {
+        // Call the callback function instead of returning
+
+        callback(results);
+      } else {
+        callback("Could not find address");
+      }
+    });
+  }
+
+  function submitForm(){
+    address = $("#addressInput").val();
+    if(address){
+      geocoder = new google.maps.Geocoder();
+      geocodeForm(geocoder, address, function(results) {
+        // This function gets called by the geocodeCodeForm function on success
+        $("#lat").val(results[0].geometry.location.lat());
+        $("#lng").val(results[0].geometry.location.lng());
+        document.searchForm.submit();
+      });
+    }
+  }
+
+
+  </script>
+
+  {% endblock %}

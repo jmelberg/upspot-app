@@ -1,0 +1,45 @@
+<!--- Start Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button id="close_modal" type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Login</h4>
+      </div>
+      <div class="modal-body">
+        <center>
+          <img class="img img-responsive" src="https://s3-us-west-2.amazonaws.com/upspot/upspot-logo-black.png" style="width:75%;">
+        </center>
+        <div class="well" >
+         <form class="form-horizontal" enctype="multipart/form-data" method="POST" action="/login">
+          {% csrf_token %}
+           <fieldset>
+             <small class="label label-danger pull-right">{{error}}</small>
+             <div class="control-group">
+               <h4>Username or Email<small id="available" class="label label-success pull-right" style="display:none;"></small></h4>
+               <div class="controls">
+                 <input id="login" type="text" name="username" placeholder="" class="form-control input-lg" required autofocus>
+               </div>
+             </div>
+             <div class="control-group">
+               <h4>Password </h4>
+               <div class="controls">
+                 <input class="form-control input-lg" name="password" type="password" placeholder="" required>
+               </div>
+             </div>
+             <br></br>
+             <div class="control-group">
+               <!-- Button -->
+               <div class="controls">
+                 <button class="btn btn-success btn-lg" type="submit" style="display: block; width: 100%;">Login</button>
+               </div>
+             </div>
+           </fieldset>
+         </form>
+       </div>
+     </div>
+   </div>
+ </div>
+</div>

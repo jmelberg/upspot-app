@@ -1,0 +1,33 @@
+{% extends 'park/base.html' %}
+{% block content %}
+<style>
+.list-group-item .btn {
+  margin-left: 10px;
+}
+</style>
+<div class="row">
+  <input id="address_value" type="hidden">
+  <div class="col-md-12">
+    <h4 class="page-header" style="margin-top: 5px;" >Your Reservations</h4>
+    <div class="list-group card" style="margin-left: 0px; width: 100%;">
+      {% for reservation in reservations %}
+      <a class="list-group-item" style="width:100%; margin-left: 0px;">
+        {% if not reservation.closed %}
+        <form class="pull-right" action="reservations" method="POST">
+          {% csrf_token %}
+          <input name="reservationId" type="hidden" value="{{reservation.id}}"></input>
+          <button type="submit" class="btn btn-lg btn-success pull-right"> Check Out</button>
+        </form>
+        {% endif %}
+        <button class="btn btn-lg btn-primary pull-right"> Message Owner</button>
+        <h4>{{reservation.start}}</h4>
+      </a>
+      {% empty %}
+      <a class="list-group-item">
+        <h5> You haven't made any reservations yet.</h5>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

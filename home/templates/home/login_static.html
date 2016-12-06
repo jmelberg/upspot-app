@@ -1,0 +1,45 @@
+{% extends 'home/base.html' %}
+{% block padded_content %}
+
+<style>
+  body {
+    background-color: #008cba;
+    margin-top: 20%;
+  }
+</style>
+<br/>
+<br/>
+<br/>
+<div class="col-md-4"></div>
+<div class="col-md-4">
+  <div class="well" >
+    <h3 class="page-header">Login <small class="label label-danger pull-right">{{login_error}}</small> </h3>
+   <form class="form-horizontal" enctype="multipart/form-data" method="POST" action="login/">
+    {% csrf_token %}
+     <fieldset>
+       <small class="label label-danger pull-right">{{error}}</small>
+       <div class="control-group">
+         <h4>Username or Email<small id="available" class="label label-success pull-right" style="display:none;"></small></h4>
+         <div class="controls">
+           <input id="login" type="text" name="username" placeholder="" class="form-control input-lg" required>
+         </div>
+       </div>
+       <div class="control-group">
+         <h4>Password </h4>
+         <div class="controls">
+           <input class="form-control input-lg" name="password" type="password" placeholder="" required>
+         </div>
+       </div>
+       <br></br>
+       <div class="control-group">
+         <!-- Button -->
+         <div class="controls">
+           <button class="btn btn-success btn-lg" type="submit" style="display: block; width: 100%;">Login</button>
+         </div>
+       </div>
+     </fieldset>
+   </form>
+  </div>
+</div>
+<div class="col-md-"></div>
+{% endblock %}

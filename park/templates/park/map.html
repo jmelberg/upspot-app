@@ -1,0 +1,319 @@
+{% extends "park/base.html" %}
+{% block content %}
+<style type="text/css">
+
+#map { height: 86%;}
+.row {
+    padding-top: 0px;
+    margin-top: -20px;
+}
+#wrapper { position: relative; }
+
+#loading {
+  position: absolute; z-index: 99; opacity: .5;left:0;
+  right:0;
+  margin:20 auto;
+}
+
+.card {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+.row {
+    padding-bottom: 0px;
+    padding-top: 0px;
+}
+#spotList {
+  height: 92%;
+  overflow-y: scroll;
+  background-color: #ececec;
+}
+
+.sidebar {
+  padding-left: 0px;
+  margin-left: 0px;
+  padding-right: 0px;
+  margin-right: 0px;
+}
+</style>
+<div class="row">
+  <div class="col-md-2 sidebar">
+  <div id="spotList" class="list-group card" style="margin-left: 0px; width: 100%;">
+    <h6 id="address_name" class="page-header" style="padding-left: 2%; margin-top: 7px;">
+      <div class="dropdown">
+        Spots within
+        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+          {{radius}} {% if radius != "1" %} Miles {% else %} Mile {% endif %}
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+          <li><a class="radius">.1 Miles</a></li>
+          <li><a class="radius">.5 Miles</a></li>
+          <li><a class="radius">1 Mile</a></li>
+          <li><a class="radius">5 Miles</a></li>
+          <li><a class="radius">10 Miles</a></li>
+          <li><a class="radius">20 Miles</a></li>
+        </ul>
+      </div>
+    </h6>
+    {% for spot in spots %}
+    <a id="{{forloop.counter}}" class="list-group-item spot" href="reserve?id={{spot.id}}" style="width:100%; margin-left: 0px;">
+      <h5><span class="label label-primary pull-right">${{spot.get_price}}</span></h5>
+      <h5>{{spot.shorthand_address}}
+      </h5>
+      <p><i class="material-icons" style="color:grey;">location_on</i>Distance  {{ spot.to_miles|floatformat:2 }} miles</p>
+      <p><i class="material-icons" style="color:grey;">directions_walk</i>Walking:  {{spot.walking_time}} minutes</p>
+    </a>
+
+    {% empty %}
+    <a class="list-group-item"><h5> No spots found in the given radius. </h5></a>
+    {% endfor %}
+  </div>
+</div>
+  <div class="col-md-10">
+    <form name="searchForm" action="/park" method="GET" role="search" style="padding-left: 10px;padding-right: 10px; padding-top:10px;">
+      <div class="form-group">
+        <div class="input-group">
+          <input id="searchBox" name="search" type="text" class="form-control input-lg control" placeholder="Search an address for spots near by">
+          <input type="text" style="display: none;" />
+          <span class="input-group-btn">
+            <button id="searchButton" class="btn btn-success" type="button"><span class="glyphicon glyphicon-search" style="padding-right:5px;"></span> Search</button>
+            <input id="lat" name="lat" type="hidden">
+            <input id="lng" name="lng" type="hidden">
+          </span>
+        </div><!-- /input-group -->
+      </div>
+    </form>
+      <div class="wrapper">
+    <img id="loading" class="img-responsive" src="https://themarketingoak.files.wordpress.com/2015/07/circle-loading-animation.gif">
+    <div class="card" id="map"></div>
+  </div>
+  </div>
+</div>
+
+<div class="col-md-10 sidebar">
+</div>
+<input id="address_value" type="hidden" value="{{search}}">
+<script type="text/javascript">
+
+var map;
+var mapMarkers = [];
+var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : sParameterName[1];
+        }
+  }
+}
+
+var radius = parseFloat(getUrlParameter('radius'));
+var zoom = 17;
+if (radius >= 1) {
+  //Change zoom on change of radius of search.
+  zoom = 16 - Math.floor(Math.sqrt(radius) * 1.3);
+}
+
+function initMap() {
+  //Called on page load to render map.
+  if (navigator.geolocation && !$('#address_value').val()) {
+    navigator.geolocation.getCurrentPosition(showPosition);
+    $("#loading").show();
+  }
+  else if (!$('#address_value').val()){
+    alert("Geolocation is not supported by this browser.");
+  }
+  map = new google.maps.Map(document.getElementById('map'), {
+    zoom: zoom,
+    center: {lat: 37.7749295, lng: -122.4194155}
+  });
+  map.infowindow = new google.maps.InfoWindow();
+  var geocoder = new google.maps.Geocoder();
+  if($('#address_value').val()){
+    $('#searchBox').val($('#address_value').val());
+    geocodeAddress(geocoder, map);
+    $("#loading").hide();
+  }
+
+
+  document.getElementById('searchBox').addEventListener('keypress', function(e) {
+    var key = e.which || e.keyCode;
+    if (key === 13) { // 13 is enter
+      // code for enter
+      submitForm();
+    }
+  });
+
+  // Add autocomplete to search box
+  var input = document.getElementById('searchBox');
+  // var searchBox = new google.maps.places.SearchBox(input);
+  // Create the autocomplete helper, and associate it with
+  // an HTML text input box.
+  var autocomplete = new google.maps.places.Autocomplete(input);
+  google.maps.event.addListener(autocomplete, 'place_changed', function() {
+    submitForm();
+  });
+
+}
+function showPosition(position) {
+  gMap = new google.maps.Map(document.getElementById('map'));
+  gMap.setZoom(zoom);      // This will trigger a zoom_changed on the map
+  gMap.setCenter(new google.maps.LatLng(position.coords.latitude, position.coords.longitude));
+  reverseGeocode(position.coords.latitude, position.coords.longitude, function(result){
+      $("#searchBox").val(result);
+      submitForm();
+});
+  $("#loading").hide();
+}
+
+function geocodeAddress(geocoder, resultsMap) {
+  var address = document.getElementById('searchBox').value;
+  geocoder.geocode({'address': address}, function(results, status) {
+    if (status === google.maps.GeocoderStatus.OK) {
+      resultsMap.setCenter(results[0].geometry.location);
+      var marker = new google.maps.Marker({
+        map: resultsMap,
+        position: results[0].geometry.location
+      });
+      addSpots(resultsMap);
+    } else {
+      alert('Geocode was not successful for the following reason: ' + status);
+    }
+  });
+}
+
+function geocodeCustom(address){
+  var geocoder = new google.maps.Geocoder();
+  geocoder.geocode({'address': address}, function(results, status) {
+    if (status === google.maps.GeocoderStatus.OK) {
+      $("#Lat").val(results[0].geometry.location.lat());
+      $("#Lng").val(results[0].geometry.location.lng());
+    } else {
+      alert('Geocode was not successful for the following reason: ' + status);
+    }
+  });
+}
+
+function addSpots(resultsMap){
+  {% for spot in spots %}
+  var contentString = '<div id="content">'+
+  '<div id="siteNotice">'+
+  '</div>'+
+  '<br/>' +
+  '<img class="img img-responsive card" ' +
+  //TODO calculate the correct heading
+  'src="http://maps.googleapis.com/maps/api/streetview?size=300x150&location={{spot.lat}},{{spot.lng}}&fov=90&heading=90&pitch=10"' +
+  '></img>' +
+  '<h5 id="firstHeading" class="page-header">{{spot.shorthand_address}}</h5>'+
+  '<div id="bodyContent">'+
+  '<h5>Distance: {{spot.to_miles|floatformat:2}} miles</h5>' +
+  '<h5>Price: $5.00</h5>' +
+  // '<br/><a class="btn btn-lg btn-success" href="reserve?id={{spot.id}}"' +
+  // ' style="width: 100%;"> View Spot</a>' +
+  // '</div>'+
+  '</div>';
+
+  var infowindow = new google.maps.InfoWindow({
+    content: contentString
+  });
+  var marker = new google.maps.Marker({
+    map: resultsMap,
+    icon: "https://s3-us-west-2.amazonaws.com/upspot/upspotMarkerSmall.png",
+    position: new google.maps.LatLng({{spot.location.y}}, {{spot.location.x}})
+  });
+  marker.content = contentString;
+  marker.addListener('click', function() {
+    window.location.href = "reserve?id={{spot.id}}";
+  });
+  marker.addListener('mouseover', function() {
+    resultsMap.infowindow.setContent(this.content);
+    resultsMap.infowindow.open(resultsMap,this);
+    this.setIcon("https://s3-us-west-2.amazonaws.com/upspot/upspotMarkerGreen.png");
+    // infowindow.open(resultsMap, this);
+    // resultsMap.setCenter(this.position);
+  });
+  marker.addListener('mouseout', function() {
+    // resultsMap.infowindow.close(resultsMap,this);
+    this.setIcon("https://s3-us-west-2.amazonaws.com/upspot/upspotMarkerSmall.png");
+  });
+  mapMarkers.push(marker);
+  {% endfor %}
+
+  $(".spot").mouseenter( function(){
+    var spot_id = parseInt($(this).attr("id"));
+    var marker = mapMarkers[spot_id - 1];
+    marker.setIcon("https://s3-us-west-2.amazonaws.com/upspot/upspotMarkerGreen.png");
+    map.panTo(marker.position);
+    resultsMap.infowindow.setContent(marker.content);
+    resultsMap.infowindow.open(map, marker);
+  }).mouseleave( function(){
+    var spot_id = parseInt($(this).attr("id"));
+    var marker = mapMarkers[spot_id - 1];
+    marker.setIcon("https://s3-us-west-2.amazonaws.com/upspot/upspotMarkerSmall.png");
+    resultsMap.infowindow.close(map, marker);
+  } );
+
+}
+
+
+// Set up click listener on search button.
+$( document ).ready(function() {
+  $("#searchButton").click(function() {
+    submitForm();
+  });
+
+  // On change of the radius.
+  $(".radius").click( function() {
+    var distance = $(this).text().split(" ")[0];
+    new_url = window.location.href;
+    if (new_url.indexOf("?") > -1){
+      new_url += "&radius=" + distance;
+      if (new_url.indexOf("radius") > -1){
+        new_url = new_url.split("radius")[0] + "radius=" + distance;
+      }
+      else{
+        new_url +=  "&radius=" + distance;
+      }
+    }
+    else{
+      new_url += "?" + "&radius=" + distance;
+    }
+    window.location.href = new_url;
+  });
+
+});
+// This function delays the sending the form until it is geocoded.
+function geocodeForm(geocoder, address, callback){
+  geocoder.geocode({ 'address': address }, function (results, status) {
+    if (status == google.maps.GeocoderStatus.OK) {
+      // Call the callback function instead of returning
+
+      callback(results);
+    } else {
+      callback("Could not find address");
+    }
+  });
+}
+
+function submitForm(){
+  address = $("#searchBox").val();
+  if(address){
+    geocoder = new google.maps.Geocoder();
+    geocodeForm(geocoder, address, function(results) {
+      // This function gets called by the geocodeCodeForm function on success
+      $("#lat").val(results[0].geometry.location.lat());
+      $("#lng").val(results[0].geometry.location.lng());
+      document.searchForm.submit();
+    });
+  }
+}
+</script>
+<script async defer
+src="http://maps.google.com/maps/api/js?sensor=false&callback=initMap&libraries=places">
+</script>
+{% endblock %}

@@ -1,0 +1,54 @@
+<!--- Start Modal -->
+<div id="reserveModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button id="close_modal" type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Login</h4>
+      </div>
+      <div class="modal-body">
+        <center>
+          <img class="img img-responsive" src="https://s3-us-west-2.amazonaws.com/upspot/upspot-logo-black.png" style="width:75%;">
+        </center>
+        <div class="well" >
+         <form class="form-horizontal" enctype="multipart/form-data" method="POST" action="/park/reserve">
+          {% csrf_token %}
+           <fieldset>
+             <div class="control-group">
+               <h4>Vehicle
+                 <div class="dropdown pull-right">
+                     <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1"
+                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                         Select a vehicle
+                         <span class="caret"></span>
+                     </button>
+                     <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                         {% for vehicle in user.vehicle_set.all %}
+                         <li><a href="#">{{ vehicle.make }} {{  vehicle.model }}</a></li>
+                         {% endfor  %}
+                     </ul>
+                 </div>
+               </h4>
+               <h4>Start Time</h4>
+               <div class="controls">
+                 <input name="id" type="hidden" value={{id}}>
+               </div>
+             </div>
+             <div class="control-group">
+             </div>
+             <br/>
+             <div class="control-group">
+               <!-- Button -->
+               <div class="controls">
+                 <button class="btn btn-success btn-lg" type="submit" style="display: block; width: 100%;">Reserve</button>
+               </div>
+             </div>
+           </fieldset>
+         </form>
+       </div>
+     </div>
+   </div>
+ </div>
+</div>

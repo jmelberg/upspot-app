@@ -1,0 +1,78 @@
+{% extends 'park/base.html' %}
+
+{% block padded_content %}
+
+<style>
+.card {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.form-group{
+  border-bottom: 1px solid #000000;
+}
+
+#map { height: 40%; }
+#wrapper { position: relative;}
+#termsCheckbox {font-size:150%;}
+</style>
+<div class="row">
+  <input id="address_value" type="hidden">
+  <div class="col-md-6">
+    <!-- <br/>
+    <div class="wrapper">
+    <img id="loading" class="img-responsive" src="https://themarketingoak.files.wordpress.com/2015/07/circle-loading-animation.gif">
+    <div id="map"></div
+  </div>
+</div> -->
+<h4 class="page-header" style="margin-top: 10px;">Your vehicles</h4>
+<div class="list-group card" style="margin-left: 0px; width: 100%;">
+  {% for vehicle in vehicles %}
+  <a class="list-group-item" href="/" style="width:100%; margin-left: 0px;"><h4>{{vehicle.make}} {{vehicle.model}}</h4></a>
+  {% empty %}
+  <a class="list-group-item"><h5> You have not added any vehicles yet. </h5></a>
+  {% endfor %}
+
+</div>
+</div>
+  <div class="col-md-6">
+    <div class="panel panel-primary">
+      <h4 class="panel-heading">Add a vehicle</h4>
+      <div class="panel-content">
+        <div class="well" >
+
+          <form class="form-horizontal" enctype="multipart/form-data" method="POST" action="/park/vehicles/">
+            {% csrf_token %}
+            <fieldset>
+              <div class="control-group">
+                <h5>Make</h5>
+                <div class="controls">
+                  <input type="text" name="make" placeholder="Example: Honda" class="form-control input-lg" required autofocus>
+                </div>
+              </div>
+              <div class="control-group">
+                <h5>Model</h5>
+                <div class="controls">
+                  <input class="form-control input-lg" name="model" type="text" placeholder="Example: Civic" required>
+                </div>
+              </div>
+              <div class="control-group">
+                <h5>License Plate</h5>
+                <div class="controls">
+                  <input class="form-control input-lg" type="text" placeholder="XXXXXX" required>
+                </div>
+                <br/>
+                <div class="control-group">
+                  <!-- Button -->
+                  <div class="controls">
+                    <button class="btn btn-success btn-lg" type="submit" style="display: block; width: 100%;">Add Vehicle</button>
+                  </div>
+                </div>
+              </fieldset>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+{% endblock %}

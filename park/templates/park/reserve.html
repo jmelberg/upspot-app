@@ -1,0 +1,81 @@
+{% extends 'park/base.html' %}
+{% block content %}
+{% load staticfiles %}
+<script src="{% static "park/reserveMap.js" %}"></script>
+
+
+<style>
+body {
+  overflow-x: hidden;
+}
+.page-header {
+  margin-top: 10px;
+  padding-left: 10px;
+}
+
+.card {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+#bannerMap {
+  margin-top: -23px;
+  margin-left: -2%;
+  margin-right: -2%;
+}
+
+</style>
+<div id="bannerMap" class="row">
+  <div class="col-md-12">
+    <div id="map" class="card" style="width: 100%; height: 40%;"></div>
+  </div>
+
+</div>
+<div class="row">
+<div class="col-md-6">
+  <h5 class="page-header">Street View</h5>
+  <div id="pano" class="card" style="width: 100%; height: 40%;"></div>
+</div>
+<div class="col-md-6">
+  <h5 class="page-header">Reservation</h5>
+  <div style="width: 100%; height: 40%;">
+    <div class="panel panel-primary">
+    <div class="panel-body">
+      <h4 class="page-header" style="margin-left: 10px;">
+        {{spot.shorthand_address}}
+        <p class="pull-right">Rating: {{spot.rating}}</p>
+      </h4>
+      <h5>Price</h5>
+      <h5>Owner</h5>
+      <h5>Spot Type/ Spot Number</h5>
+      <h5>Distance</h5>
+    </div>
+    <a style="width: 100%;" class="btn btn-success btn-lg"
+      data-toggle="modal"
+      {% if user.is_authenticated %}
+      data-target="#reserveModal"
+      {% else %}
+      data-target="#myModal"
+      {% endif %}
+      >Reserve Spot</a>
+    </div>
+  </div>
+</div>
+</div>
+<br/>
+</div>
+
+<!-- Init Google Map Street and Sattellite View -->
+   <script>
+     function createMap(){
+        var lat = {{spot.lat}};
+        var lng = {{spot.lng}};
+        var sv_lat = {{spot.sv_lat}};
+        var sv_lng = {{spot.sv_lng}};
+        createReserveMap(lat,lng, sv_lat, sv_lng);
+     }
+   </script>
+  <script async defer
+    src="http://maps.google.com/maps/api/js?sensor=false&callback=createMap">
+  </script>
+<!-- End Map -->
+{% endblock %}
