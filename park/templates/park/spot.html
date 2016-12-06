@@ -175,13 +175,12 @@
   }
 
   function geocodeCustom(address){
-    var map = new google.maps.Map(document.getElementById('map'));
     var geocoder = new google.maps.Geocoder();
     geocoder.geocode({'address': address}, function(results, status) {
       if (status === google.maps.GeocoderStatus.OK) {
         $("#Lat").val(results[0].geometry.location.lat());
         $("#Lng").val(results[0].geometry.location.lng());
-        map.setCenter(results[0].geometry.location);
+        // map.setCenter(results[0].geometry.location);
         if(spotMarker){
           spotMarker.setMap(null);
         }
