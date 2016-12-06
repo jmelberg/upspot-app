@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+import dj_database_url
+
+db_from_env = dj_database_url.config()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -78,17 +81,27 @@ WSGI_APPLICATION = 'upspot.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'upspot',
         'USER' : 'upspot',
         'PASSWORD' : 'upspot',
-        'HOST' : 'localhost',
-        'PORT' : '5432',
+        # 'HOST' : 'localhost',
+        # 'PORT' : '5432',
     }
 }
+
+# DATABASES['default'] = dj_database_url.config()
+# DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
+# DATABASES['default']['NAME'] = 'upspot'
+# DATABASES['default']['USER'] = 'upspot'
+# DATABASES['default']['PASSWORD'] = 'upspot'
+
+db_from_env = dj_database_url.config(conn_max_age=500)
+print("*****")
+print db_from_env
+DATABASES['default'].update(db_from_env)
 
 
 # Password validation
