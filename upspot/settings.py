@@ -82,19 +82,9 @@ WSGI_APPLICATION = 'upspot.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'upspot',
-        'USER' : 'upspot',
-        'PASSWORD' : 'upspot',
-        # 'HOST' : 'postgres://yyuexjfjbhgtxh:n5K_lvDLTVx7MHzjIEH08S-dfA@ec2-54-75-231-55.eu-west-1.compute.amazonaws.com',
-        # 'PORT' : '5432/d507pseq0t0iaf'
-    }
-}
 
-db_from_env = dj_database_url.config(conn_max_age=500)
-DATABASES['default'].update(db_from_env)
+DATABASES['default'] = dj_database_url.config()
+DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 
 
 # Password validation
