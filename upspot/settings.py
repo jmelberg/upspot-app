@@ -17,6 +17,7 @@ db_from_env = dj_database_url.config()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
 # Quick-start development settings - unsuitable for production
@@ -87,20 +88,12 @@ DATABASES = {
         'NAME': 'upspot',
         'USER' : 'upspot',
         'PASSWORD' : 'upspot',
-        # 'HOST' : 'localhost',
-        # 'PORT' : '5432',
+        'HOST' : 'postgres://yyuexjfjbhgtxh:n5K_lvDLTVx7MHzjIEH08S-dfA@ec2-54-75-231-55.eu-west-1.compute.amazonaws.com',
+        'PORT' : '5432/d507pseq0t0iaf'
     }
 }
 
-# DATABASES['default'] = dj_database_url.config()
-# DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
-# DATABASES['default']['NAME'] = 'upspot'
-# DATABASES['default']['USER'] = 'upspot'
-# DATABASES['default']['PASSWORD'] = 'upspot'
-
 db_from_env = dj_database_url.config(conn_max_age=500)
-print("*****")
-print db_from_env
 DATABASES['default'].update(db_from_env)
 
 
