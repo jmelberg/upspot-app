@@ -88,8 +88,8 @@ DATABASES = {
         'NAME': 'upspot',
         'USER' : 'upspot',
         'PASSWORD' : 'upspot',
-        'HOST' : 'postgres://yyuexjfjbhgtxh:n5K_lvDLTVx7MHzjIEH08S-dfA@ec2-54-75-231-55.eu-west-1.compute.amazonaws.com',
-        'PORT' : '5432/d507pseq0t0iaf'
+        # 'HOST' : 'postgres://yyuexjfjbhgtxh:n5K_lvDLTVx7MHzjIEH08S-dfA@ec2-54-75-231-55.eu-west-1.compute.amazonaws.com',
+        # 'PORT' : '5432/d507pseq0t0iaf'
     }
 }
 
