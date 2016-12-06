@@ -180,12 +180,16 @@
       if (status === google.maps.GeocoderStatus.OK) {
         $("#Lat").val(results[0].geometry.location.lat());
         $("#Lng").val(results[0].geometry.location.lng());
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 22,
+          center: results[0].geometry.location
+        });
         // map.setCenter(results[0].geometry.location);
         if(spotMarker){
           spotMarker.setMap(null);
         }
         spotMarker = new google.maps.Marker({
-          map: map,
+          map: masp,
           position: results[0].geometry.location,
           icon: "https://s3-us-west-2.amazonaws.com/upspot/upspotMarkerSmall.png",
           draggable: true
